@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:reading/models/article.dart';
 import 'package:reading/models/feed_source.dart';
 import 'package:reading/providers/feed_provider.dart';
+import 'package:reading/services/rss_service.dart';
 import 'package:reading/services/storage_service.dart';
 
 void main() {
@@ -41,10 +42,55 @@ void main() {
       'Third',
     ]);
   });
+
+  test('does not show the global refresh banner for partial feed failures',
+      () async {
+    final storage = _MemoryStorageService(
+      feeds: [
+        _feed('Good', 'https://example.com/good.xml'),
+        _feed('Bad', 'https://example.com/bad.xml'),
+      ],
+    );
+    final provider = FeedProvider(
+      storage,
+      rss: _FakeRssService(failingUrls: {'https://example.com/bad.xml'}),
+    );
+
+    await provider.init();
+
+    expect(provider.errorMessage, isNull);
+    expect(provider.articlesForSource('Good'), hasLength(1));
+    expect(provider.articlesForSource('Bad'), isEmpty);
+  });
+
+  test('shows the global refresh banner when every feed fails', () async {
+    final storage = _MemoryStorageService(
+      feeds: [
+        _feed('Bad One', 'https://example.com/bad-one.xml'),
+        _feed('Bad Two', 'https://example.com/bad-two.xml'),
+      ],
+    );
+    final provider = FeedProvider(
+      storage,
+      rss: _FakeRssService(
+        failingUrls: {
+          'https://example.com/bad-one.xml',
+          'https://example.com/bad-two.xml',
+        },
+      ),
+    );
+
+    await provider.init();
+
+    expect(
+        provider.errorMessage, 'Feeds could not refresh. Try again in a bit.');
+  });
 }
 
 class _MemoryStorageService extends StorageService {
-  List<FeedSource> savedFeeds = [];
+  List<FeedSource> savedFeeds;
+
+  _MemoryStorageService({List<FeedSource>? feeds}) : savedFeeds = feeds ?? [];
 
   @override
   Future<List<FeedSource>> loadFeeds() async => savedFeeds;
@@ -62,4 +108,33 @@ class _MemoryStorageService extends StorageService {
 
   @override
   Future<void> setDarkMode(bool value) async {}
+}
+
+class _FakeRssService extends RssService {
+  final Set<String> failingUrls;
+
+  _FakeRssService({required this.failingUrls});
+
+  @override
+  Future<FeedFetchResult> fetchAnyResult(String url, String sourceName) async {
+    if (failingUrls.contains(url)) {
+      return const FeedFetchResult.failure('Nope.');
+    }
+    return FeedFetchResult.success([
+      Article(
+        title: '$sourceName article',
+        url: 'https://example.com/$sourceName',
+        sourceName: sourceName,
+      ),
+    ]);
+  }
+}
+
+FeedSource _feed(String name, String url) {
+  return FeedSource(
+    name: name,
+    url: url,
+    favicon: '',
+    enabled: true,
+  );
 }

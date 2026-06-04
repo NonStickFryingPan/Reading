@@ -12,7 +12,7 @@ class FeedProvider extends ChangeNotifier {
   static const int articleRevealIncrement = 5;
 
   final StorageService _storage;
-  final RssService _rss = RssService();
+  final RssService _rss;
   late final FeedDiscoveryService _discovery = FeedDiscoveryService(rss: _rss);
   final OpmlService _opml = OpmlService();
 
@@ -30,7 +30,7 @@ class FeedProvider extends ChangeNotifier {
   Future<void>? _refreshFuture;
   String? _errorMessage;
 
-  FeedProvider(this._storage);
+  FeedProvider(this._storage, {RssService? rss}) : _rss = rss ?? RssService();
 
   List<FeedSource> get feeds => _feeds;
   Map<String, List<Article>> get articles => _articles;
@@ -125,20 +125,21 @@ class FeedProvider extends ChangeNotifier {
     }
     notifyListeners();
 
+    var successCount = 0;
+    var failedCount = 0;
     try {
       final futures = feeds.map((feed) async {
         try {
           final result = await _rss.fetchAnyResult(feed.url, feed.name);
           if (result.isSuccess) {
             _articles[feed.name] = result.articles;
+            successCount++;
           } else {
-            _errorMessage ??=
-                'Some feeds could not refresh. Showing saved articles where available.';
+            failedCount++;
           }
         } catch (error, stackTrace) {
           debugPrint('Failed to refresh ${feed.name}: $error\n$stackTrace');
-          _errorMessage ??=
-              'Some feeds could not refresh. Showing saved articles where available.';
+          failedCount++;
         } finally {
           _loading[feed.name] = false;
           notifyListeners();
@@ -146,6 +147,9 @@ class FeedProvider extends ChangeNotifier {
       });
 
       await Future.wait(futures);
+      if (successCount == 0 && failedCount > 0) {
+        _errorMessage = 'Feeds could not refresh. Try again in a bit.';
+      }
     } finally {
       _isRefreshing = false;
       _refreshFuture = null;
