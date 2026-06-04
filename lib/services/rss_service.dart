@@ -1,10 +1,8 @@
-import 'dart:convert';
-import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' as http;
 import 'package:webfeed/webfeed.dart';
 import '../models/article.dart';
 import '../utils/url_utils.dart';
+import 'feed_http_client.dart';
 
 class FeedFetchResult {
   final List<Article> articles;
@@ -18,9 +16,10 @@ class FeedFetchResult {
 }
 
 class RssService {
-  static const Duration _timeout = Duration(seconds: 10);
   static const int _maxArticlesPerFeed = 30;
-  static const int _maxResponseBytes = 5 * 1024 * 1024;
+  final FeedHttpClient _http;
+
+  RssService({FeedHttpClient? http}) : _http = http ?? FeedHttpClient();
 
   Future<List<Article>> fetchFeed(String url, String sourceName) async {
     try {
@@ -96,44 +95,7 @@ class RssService {
   }
 
   Future<String?> _fetchBody(String url) async {
-    final uri = UrlUtils.parseHttpUrl(url);
-    if (uri == null) {
-      debugPrint('Rejected unsafe feed URL: $url');
-      return null;
-    }
-
-    final client = http.Client();
-    try {
-      final request = http.Request('GET', uri);
-      final response = await client.send(request).timeout(_timeout);
-
-      if (response.statusCode != 200) {
-        debugPrint('Feed request failed (${response.statusCode}): $uri');
-        return null;
-      }
-
-      final contentLength = response.contentLength;
-      if (contentLength != null && contentLength > _maxResponseBytes) {
-        debugPrint('Rejected oversized feed ($contentLength bytes): $uri');
-        return null;
-      }
-
-      final bytes = BytesBuilder(copy: false);
-      await for (final chunk in response.stream.timeout(_timeout)) {
-        bytes.add(chunk);
-        if (bytes.length > _maxResponseBytes) {
-          debugPrint('Rejected feed after exceeding size cap: $uri');
-          return null;
-        }
-      }
-
-      return utf8.decode(bytes.takeBytes());
-    } catch (error, stackTrace) {
-      debugPrint('Feed request failed for $uri: $error\n$stackTrace');
-      return null;
-    } finally {
-      client.close();
-    }
+    return (await _http.getText(url))?.body;
   }
 
   List<Article> _parseArticles(RssFeed feed, String sourceName) {

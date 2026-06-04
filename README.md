@@ -8,6 +8,7 @@ Add your favorite sources, browse recent articles, and save stories for later. R
 
 - Follow RSS and Atom feeds
 - Add custom sources
+- Import and export your feed list
 - Bookmark articles
 - Reorder your sources
 - Use dark mode

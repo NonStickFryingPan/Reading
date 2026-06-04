@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/feed_provider.dart';
+import '../services/document_file_service.dart';
 import '../utils/url_utils.dart';
 
 class SettingsView extends StatelessWidget {
+  static final DocumentFileService _documents = DocumentFileService();
+
   const SettingsView({super.key});
 
   @override
@@ -124,9 +127,32 @@ class SettingsView extends StatelessWidget {
               child: ListTile(
                 leading: const Icon(Icons.add_link),
                 title: const Text('Add RSS Feed'),
-                subtitle: const Text('Enter a custom RSS or Atom feed URL'),
+                subtitle: const Text('Enter a site, RSS, or Atom URL'),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () => _showAddFeedDialog(context, provider),
+              ),
+            ),
+
+            // OPML
+            SliverToBoxAdapter(
+              child: _buildSectionHeader(context, 'OPML'),
+            ),
+            SliverToBoxAdapter(
+              child: ListTile(
+                leading: const Icon(Icons.file_upload_outlined),
+                title: const Text('Import OPML'),
+                subtitle: const Text('Add feeds from another reader'),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => _importOpml(context, provider),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: ListTile(
+                leading: const Icon(Icons.file_download_outlined),
+                title: const Text('Export OPML'),
+                subtitle: const Text('Save your feed list'),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => _exportOpml(context, provider),
               ),
             ),
 
@@ -195,7 +221,7 @@ class SettingsView extends StatelessWidget {
                           children: [
                             CircularProgressIndicator(),
                             SizedBox(height: 16),
-                            Text('Validating feed...'),
+                            Text('Finding feed...'),
                           ],
                         ),
                       ),
@@ -231,5 +257,56 @@ class SettingsView extends StatelessWidget {
         ],
       ),
     ).whenComplete(controller.dispose);
+  }
+
+  Future<void> _importOpml(BuildContext context, FeedProvider provider) async {
+    try {
+      final content = await _documents.importText(
+        mimeTypes: const [
+          'text/x-opml',
+          'text/xml',
+          'application/xml',
+          'application/octet-stream',
+        ],
+      );
+      if (content == null) return;
+
+      final count = await provider.importFeedsFromOpml(content);
+      if (!context.mounted) return;
+
+      final message = count == 0
+          ? 'No new feeds found.'
+          : 'Imported $count feed${count == 1 ? '' : 's'}. Pull to refresh.';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
+    } catch (error) {
+      if (!context.mounted) return;
+      final message = error.toString().replaceFirst('Exception: ', '');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Import failed: $message')),
+      );
+    }
+  }
+
+  Future<void> _exportOpml(BuildContext context, FeedProvider provider) async {
+    try {
+      final exported = await _documents.exportText(
+        fileName: 'reading-feeds.opml',
+        mimeType: 'text/x-opml',
+        content: provider.exportOpml(),
+      );
+      if (!context.mounted || !exported) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Feeds exported.')),
+      );
+    } catch (error) {
+      if (!context.mounted) return;
+      final message = error.toString().replaceFirst('Exception: ', '');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Export failed: $message')),
+      );
+    }
   }
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import '../models/feed_source.dart';
 import '../models/article.dart';
+import '../services/feed_discovery_service.dart';
+import '../services/opml_service.dart';
 import '../services/rss_service.dart';
 import '../services/storage_service.dart';
 import '../utils/url_utils.dart';
@@ -11,6 +13,8 @@ class FeedProvider extends ChangeNotifier {
 
   final StorageService _storage;
   final RssService _rss = RssService();
+  late final FeedDiscoveryService _discovery = FeedDiscoveryService(rss: _rss);
+  final OpmlService _opml = OpmlService();
 
   List<FeedSource> _feeds = [];
   List<FeedSource>? _enabledFeedsCache;
@@ -150,13 +154,8 @@ class FeedProvider extends ChangeNotifier {
   }
 
   Future<List<Article>> validateAndAddFeed(String url) async {
-    final uri = UrlUtils.parseHttpUrl(url);
-    if (uri == null) {
-      throw Exception(
-          'Enter a valid http or https RSS URL without credentials.');
-    }
-
-    final normalizedUrl = UrlUtils.normalize(uri.toString());
+    final discovered = await _discovery.discover(url);
+    final normalizedUrl = UrlUtils.normalize(discovered.url);
     final duplicate = _feeds.any(
       (feed) => UrlUtils.normalize(feed.url) == normalizedUrl,
     );
@@ -164,19 +163,13 @@ class FeedProvider extends ChangeNotifier {
       throw Exception('This feed is already in your sources.');
     }
 
-    final isValid = await _rss.validateFeed(normalizedUrl);
-    if (!isValid) {
-      throw Exception('Invalid RSS feed or could not connect.');
-    }
+    final uri = UrlUtils.parseHttpUrl(normalizedUrl);
+    if (uri == null) throw Exception('Could not add this feed.');
 
-    final name = uri.host.replaceAll('www.', '').split('.').first;
-    if (name.isEmpty) {
-      throw Exception('Could not create a feed name from this URL.');
-    }
-
-    final baseName = name[0].toUpperCase() + name.substring(1);
-    final uniqueName = _uniqueFeedName(baseName);
-    final favicon = '${uri.scheme}://${uri.host}/favicon.ico';
+    final uniqueName = _uniqueFeedName(_cleanFeedName(discovered.title, uri));
+    final favicon = UrlUtils.isSafeHttpUrl(discovered.favicon ?? '')
+        ? discovered.favicon!
+        : '${uri.scheme}://${uri.host}/favicon.ico';
     final newFeed = FeedSource(
       name: uniqueName,
       url: normalizedUrl,
@@ -197,6 +190,45 @@ class FeedProvider extends ChangeNotifier {
 
     notifyListeners();
     return result.articles;
+  }
+
+  String exportOpml() => _opml.exportFeeds(_feeds);
+
+  Future<int> importFeedsFromOpml(String content) async {
+    final importedFeeds = _opml.importFeeds(content);
+    if (importedFeeds.isEmpty) {
+      throw Exception('No valid feeds were found in this OPML file.');
+    }
+
+    var importedCount = 0;
+    var nextFeeds = [..._feeds];
+
+    for (final feed in importedFeeds) {
+      final normalizedUrl = UrlUtils.normalize(feed.url);
+      final duplicate = nextFeeds.any(
+        (existing) => UrlUtils.normalize(existing.url) == normalizedUrl,
+      );
+      if (duplicate) continue;
+
+      final uri = UrlUtils.parseHttpUrl(normalizedUrl);
+      if (uri == null) continue;
+
+      nextFeeds.add(
+        feed.copyWith(
+          name: _uniqueFeedNameIn(_cleanFeedName(feed.name, uri), nextFeeds),
+          url: normalizedUrl,
+          order: nextFeeds.length,
+        ),
+      );
+      importedCount++;
+    }
+
+    if (importedCount == 0) return 0;
+
+    _setFeeds(_normalizeFeedOrder(nextFeeds));
+    await _storage.saveFeeds(_feeds);
+    notifyListeners();
+    return importedCount;
   }
 
   Future<void> toggleFeed(FeedSource feed) async {
@@ -349,7 +381,11 @@ class FeedProvider extends ChangeNotifier {
   }
 
   String _uniqueFeedName(String baseName) {
-    final existing = _feeds.map((feed) => feed.name).toSet();
+    return _uniqueFeedNameIn(baseName, _feeds);
+  }
+
+  String _uniqueFeedNameIn(String baseName, List<FeedSource> feeds) {
+    final existing = feeds.map((feed) => feed.name).toSet();
     if (!existing.contains(baseName)) return baseName;
 
     var counter = 2;
@@ -357,5 +393,16 @@ class FeedProvider extends ChangeNotifier {
       counter++;
     }
     return '$baseName $counter';
+  }
+
+  String _cleanFeedName(String? value, Uri uri) {
+    final fallback =
+        uri.host.replaceFirst(RegExp(r'^www\.'), '').split('.').first;
+    var name =
+        (value == null || value.trim().isEmpty) ? fallback : value.trim();
+    name = name.replaceAll(RegExp(r'\s+'), ' ');
+    if (name.isEmpty) return 'Feed';
+    if (name.length > 60) name = name.substring(0, 60).trim();
+    return name[0].toUpperCase() + name.substring(1);
   }
 }

@@ -18,7 +18,7 @@ class UrlUtils {
   static String normalize(String value) {
     final uri = parseHttpUrl(value);
     if (uri == null) return value.trim();
-    return uri.replace(fragment: '').toString();
+    return uri.replace(fragment: null).toString();
   }
 
   static String displayUrl(String value) {
