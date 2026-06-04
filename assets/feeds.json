@@ -1,0 +1,104 @@
+[
+  {
+    "name": "Lobsters",
+    "url": "https://lobste.rs/rss",
+    "favicon": "https://lobste.rs/favicon.ico",
+    "enabled": true
+  },
+  {
+    "name": "Hacker News",
+    "url": "https://hnrss.org/frontpage",
+    "favicon": "https://news.ycombinator.com/favicon.ico",
+    "enabled": true
+  },
+  {
+    "name": "Ars Technica",
+    "url": "https://feeds.arstechnica.com/arstechnica/index",
+    "favicon": "https://arstechnica.com/favicon.ico",
+    "enabled": true
+  },
+  {
+    "name": "Reddit Frontpage",
+    "url": "https://www.reddit.com/.rss",
+    "favicon": "https://www.reddit.com/favicon.ico",
+    "enabled": true
+  },
+  {
+    "name": "WIRED",
+    "url": "https://www.wired.com/feed/rss",
+    "favicon": "https://www.wired.com/favicon.ico",
+    "enabled": true
+  },
+  {
+    "name": "The Verge",
+    "url": "https://www.theverge.com/rss/index.xml",
+    "favicon": "https://www.theverge.com/favicon.ico",
+    "enabled": true
+  },
+  {
+    "name": "BBC News",
+    "url": "https://feeds.bbci.co.uk/news/rss.xml",
+    "favicon": "https://www.bbc.co.uk/favicon.ico",
+    "enabled": false
+  },
+  {
+    "name": "Smashing Magazine",
+    "url": "https://www.smashingmagazine.com/feed/",
+    "favicon": "https://www.smashingmagazine.com/favicon.ico",
+    "enabled": false
+  },
+  {
+    "name": "The Onion",
+    "url": "https://theonion.com/rss",
+    "favicon": "https://theonion.com/favicon.ico",
+    "enabled": false
+  },
+  {
+    "name": "Core77",
+    "url": "https://www.core77.com/feed",
+    "favicon": "https://www.core77.com/favicon.ico",
+    "enabled": false
+  },
+  {
+    "name": "MacRumors",
+    "url": "https://feeds.macrumors.com/MacRumors-All",
+    "favicon": "https://www.macrumors.com/favicon.ico",
+    "enabled": false
+  },
+  {
+    "name": "Boing Boing",
+    "url": "https://boingboing.net/feed",
+    "favicon": "https://boingboing.net/favicon.ico",
+    "enabled": false
+  },
+  {
+    "name": "Engadget",
+    "url": "https://www.engadget.com/rss.xml",
+    "favicon": "https://www.engadget.com/favicon.ico",
+    "enabled": false
+  },
+  {
+    "name": "The Register",
+    "url": "https://www.theregister.com/headlines.atom",
+    "favicon": "https://www.theregister.com/favicon.ico",
+    "enabled": false
+  },
+  {
+    "name": "The Next Web",
+    "url": "https://thenextweb.com/feed",
+    "favicon": "https://thenextweb.com/favicon.ico",
+    "enabled": false
+  },
+  {
+    "name": "Lifehacker",
+    "url": "https://lifehacker.com/feed/rss",
+    "favicon": "https://lifehacker.com/favicon.ico",
+    "enabled": false
+  },
+  {
+    "name": "NYT World News",
+    "url": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml",
+    "favicon": "https://www.nytimes.com/favicon.ico",
+    "enabled": false
+  }
+]
