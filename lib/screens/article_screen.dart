@@ -76,6 +76,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
             if (mounted) setState(() => _progress = progress);
           },
           onWebResourceError: (error) {
+            if (!_shouldShowArticleError(error)) return;
             if (mounted) {
               setState(() {
                 _isLoading = false;
@@ -143,6 +144,10 @@ class _ArticleScreenState extends State<ArticleScreen> {
           : WebViewWidget(controller: controller),
     );
   }
+}
+
+bool _shouldShowArticleError(WebResourceError error) {
+  return error.isForMainFrame ?? true;
 }
 
 class _ArticleError extends StatelessWidget {

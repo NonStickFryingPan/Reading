@@ -1,8 +1,17 @@
-# Reading
+<div align="center">
 
-Reading is a simple app for following RSS and Atom feeds.
+# 📖 Reading
+**A quiet, fast feed reader for people who just want the good links**
 
-Add your favorite sources, browse recent articles, and save stories for later. Reading is designed to stay quiet, fast, and easy to use.
+[![Version](https://img.shields.io/badge/version-V1.0-5B5FEF?style=flat-square)](#release)
+[![Android](https://img.shields.io/badge/android-ready-2EA44F?style=flat-square)](#release)
+[![Focus](https://img.shields.io/badge/focus-lightweight-111827?style=flat-square)](#features)
+
+[Features](#features) · [Release](#release) · [Support](#support)
+
+</div>
+
+---
 
 ## Features
 
@@ -13,6 +22,10 @@ Add your favorite sources, browse recent articles, and save stories for later. R
 - Reorder your sources
 - Use dark mode
 - Copy links with a long press
+
+## Release
+
+The current APK is V1.0.
 
 ## Support
 
