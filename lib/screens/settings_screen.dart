@@ -63,24 +63,27 @@ class SettingsView extends StatelessWidget {
                   return Material(
                     key: ValueKey(feed.url),
                     color: Colors.transparent,
-                    child: ReorderableDragStartListener(
-                      index: index,
-                      child: ListTile(
-                        leading: const Icon(Icons.drag_handle),
-                        title: Text(feed.name),
-                        subtitle: Text(
-                          UrlUtils.displayUrl(feed.url),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context).textTheme.bodyMedium,
+                    child: ListTile(
+                      leading: ReorderableDragStartListener(
+                        index: index,
+                        child: const SizedBox.square(
+                          dimension: 48,
+                          child: Icon(Icons.drag_handle),
                         ),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.remove_circle_outline),
-                          color: Colors.red,
-                          onPressed: () async {
-                            await provider.removeFeed(feed);
-                          },
-                        ),
+                      ),
+                      title: Text(feed.name),
+                      subtitle: Text(
+                        UrlUtils.displayUrl(feed.url),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.remove_circle_outline),
+                        color: Colors.red,
+                        onPressed: () async {
+                          await provider.removeFeed(feed);
+                        },
                       ),
                     ),
                   );

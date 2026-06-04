@@ -277,10 +277,7 @@ class FeedProvider extends ChangeNotifier {
     final enabled = enabledFeeds;
     if (oldIndex < 0 || oldIndex >= enabled.length) return;
     if (newIndex < 0 || newIndex > enabled.length) return;
-
-    if (oldIndex < newIndex) {
-      newIndex -= 1;
-    }
+    if (oldIndex == newIndex) return;
 
     final item = enabled.removeAt(oldIndex);
     enabled.insert(newIndex, item);
