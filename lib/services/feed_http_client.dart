@@ -36,7 +36,7 @@ class FeedHttpClient {
       final request = http.Request('GET', uri)
         ..headers['User-Agent'] = userAgent
         ..headers['Accept'] =
-            'application/rss+xml, application/atom+xml, application/xml, text/xml, text/html, */*';
+            'application/rss+xml, application/atom+xml, application/xml, text/xml, */*';
       final response = await client.send(request).timeout(timeout);
 
       if (response.statusCode != 200) {

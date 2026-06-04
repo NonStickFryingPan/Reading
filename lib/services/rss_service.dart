@@ -59,7 +59,10 @@ class RssService {
 
     try {
       final rssFeed = RssFeed.parse(body);
-      return FeedFetchResult.success(_parseArticles(rssFeed, sourceName));
+      final articles = _parseArticles(rssFeed, sourceName);
+      if (articles.isNotEmpty || !_looksLikeAtom(body)) {
+        return FeedFetchResult.success(articles);
+      }
     } catch (error) {
       debugPrint('RSS parse failed for "$sourceName", trying Atom: $error');
     }
@@ -72,6 +75,10 @@ class RssService {
     }
 
     return const FeedFetchResult.failure('Could not parse feed.');
+  }
+
+  bool _looksLikeAtom(String body) {
+    return RegExp(r'<feed(\s|>)', caseSensitive: false).hasMatch(body);
   }
 
   Future<bool> validateFeed(String url) async {
