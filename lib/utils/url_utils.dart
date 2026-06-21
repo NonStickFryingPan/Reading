@@ -21,6 +21,43 @@ class UrlUtils {
     return uri.replace(fragment: null).toString();
   }
 
+  static Uri? sourceHomepageUri({
+    String? homepageUrl,
+    required String feedUrl,
+    String? faviconUrl,
+  }) {
+    final homepage = _safeHomepageUri(homepageUrl);
+    if (homepage != null) return homepage;
+
+    return _originUri(faviconUrl) ?? _originUri(feedUrl);
+  }
+
+  static Uri? _safeHomepageUri(String? value) {
+    if (value == null || value.trim().isEmpty) return null;
+    final uri = parseHttpUrl(value);
+    if (uri == null) return null;
+
+    return Uri(
+      scheme: uri.scheme,
+      host: uri.host,
+      port: uri.hasPort ? uri.port : null,
+      path: uri.path.isEmpty ? '/' : uri.path,
+    );
+  }
+
+  static Uri? _originUri(String? value) {
+    if (value == null || value.trim().isEmpty) return null;
+    final uri = parseHttpUrl(value);
+    if (uri == null) return null;
+
+    return Uri(
+      scheme: uri.scheme,
+      host: uri.host,
+      port: uri.hasPort ? uri.port : null,
+      path: '/',
+    );
+  }
+
   static String displayUrl(String value) {
     final uri = Uri.tryParse(value);
     if (uri == null) return value;

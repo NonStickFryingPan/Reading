@@ -1,17 +1,21 @@
 <div align="center">
 
-# 📖 Reading
-**A quiet, fast feed reader for people who just want the good links**
+# Reading
+**A minimal RSS news aggregator**
 
-[![Version](https://img.shields.io/badge/version-V1.0-5B5FEF?style=flat-square)](#release)
-[![Android](https://img.shields.io/badge/android-ready-2EA44F?style=flat-square)](#release)
-[![Focus](https://img.shields.io/badge/focus-lightweight-111827?style=flat-square)](#features)
+![Flutter](https://img.shields.io/badge/Flutter-02569B?style=flat-square&logo=flutter&logoColor=white)
+![Dart](https://img.shields.io/badge/Dart-0175C2?style=flat-square&logo=dart&logoColor=white)
 
-[Features](#features) · [Release](#release) · [Support](#support)
+<img width="1280" alt="Reading screenshot 1" src="./artifacts/screenshot1.jpg" />
+<img width="1280" alt="Reading screenshot 2" src="./artifacts/screenshot2.jpg" />
 
 </div>
 
 ---
+
+## About
+
+Reading is a minimal RSS feed reader built with Flutter.
 
 ## Features
 
@@ -20,13 +24,9 @@
 - Import and export your feed list
 - Bookmark articles
 - Reorder your sources
-- Use dark mode
+- Dark mode support
 - Copy links with a long press
 
-## Release
+## License
 
-The current APK is V1.0.
-
-## Support
-
-For help, contact theluqmanmalik@gmail.com.
+MIT

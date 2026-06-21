@@ -2,6 +2,7 @@ class FeedSource {
   final String name;
   final String url;
   final String favicon;
+  final String homepageUrl;
   final bool enabled;
   final int order;
 
@@ -9,6 +10,7 @@ class FeedSource {
     required this.name,
     required this.url,
     required this.favicon,
+    this.homepageUrl = '',
     this.enabled = false,
     this.order = 0,
   });
@@ -17,6 +19,7 @@ class FeedSource {
     String? name,
     String? url,
     String? favicon,
+    String? homepageUrl,
     bool? enabled,
     int? order,
   }) {
@@ -24,6 +27,7 @@ class FeedSource {
       name: name ?? this.name,
       url: url ?? this.url,
       favicon: favicon ?? this.favicon,
+      homepageUrl: homepageUrl ?? this.homepageUrl,
       enabled: enabled ?? this.enabled,
       order: order ?? this.order,
     );
@@ -34,6 +38,7 @@ class FeedSource {
       'name': name,
       'url': url,
       'favicon': favicon,
+      'homepageUrl': homepageUrl,
       'enabled': enabled,
       'order': order,
     };
@@ -53,6 +58,7 @@ class FeedSource {
       name: name,
       url: url,
       favicon: map['favicon'] as String? ?? '',
+      homepageUrl: map['homepageUrl'] as String? ?? '',
       enabled: map['enabled'] ?? false,
       order: map['order'] ?? 0,
     );
