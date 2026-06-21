@@ -4,10 +4,15 @@
 **A minimal RSS news aggregator**
 
 ![Flutter](https://img.shields.io/badge/Flutter-02569B?style=flat-square&logo=flutter&logoColor=white)
-![Dart](https://img.shields.io/badge/Dart-0175C2?style=flat-square&logo=dart&logoColor=white)
 
-<img width="1280" alt="Reading screenshot 1" src="./artifacts/screenshot1.jpg" />
-<img width="1280" alt="Reading screenshot 2" src="./artifacts/screenshot2.jpg" />
+[Download it here!](./Reading.apk)
+
+<table>
+  <tr>
+    <td><img src="./artifacts/screenshot1.jpg" width="400" alt="Screenshot 1" /></td>
+    <td><img src="./artifacts/screenshot2.jpg" width="400" alt="Screenshot 2" /></td>
+  </tr>
+</table>
 
 </div>
 
