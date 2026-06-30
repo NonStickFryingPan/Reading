@@ -5,7 +5,9 @@
 
 ![Flutter](https://img.shields.io/badge/Flutter-02569B?style=flat-square&logo=flutter&logoColor=white)
 
-[Download it here!](./Reading.apk)
+[Download it here!](https://github.com/NonStickFryingPan/Reading/releases/latest)
+
+> **Note:** The APK is unsigned, so you may see a warning when installing because I was too lazy to sign it, but it's safe.
 
 <table>
   <tr>
