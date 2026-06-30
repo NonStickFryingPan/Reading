@@ -1,4 +1,4 @@
 storePassword=replace-with-keystore-password
 keyPassword=replace-with-key-password
 keyAlias=reading-upload
-storeFile=C:\\Users\\Luqman Malik\\Documents\\keystores\\reading-upload-keystore.jks
+storeFile=/path/to/your/reading-upload-keystore.jks
